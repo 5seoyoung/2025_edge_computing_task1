@@ -82,6 +82,25 @@ pip install -r requirements.txt
 python main.py
 ```
 
+### 샘플 데이터 생성 (Colab 또는 테스트용)
+
+전체 데이터셋이 너무 큰 경우, 샘플 데이터를 생성하여 사용할 수 있습니다:
+
+```bash
+python create_sample_data.py <원본_데이터_경로> <샘플_저장_경로> [train_samples] [val_samples] [test_samples]
+```
+
+예시:
+```bash
+# Train 100개, Val 20개, Test 20개 샘플 생성
+python create_sample_data.py \
+    /path/to/echonet_dynamic \
+    /path/to/sample_echonet \
+    100 20 20
+```
+
+생성된 샘플 데이터는 전체 데이터셋과 동일한 구조를 가지며, `FileList.csv`도 자동으로 생성됩니다.
+
 이 스크립트는 다음을 자동으로 수행합니다:
 
 1. **Baseline 모델 학습**: ResNet-18 기반 EF 회귀 모델 학습

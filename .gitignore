@@ -53,6 +53,7 @@ Thumbs.db
 
 # Data (don't commit large data files)
 data/
+sample_echonet_dynamic/
 *.avi
 *.mp4
 

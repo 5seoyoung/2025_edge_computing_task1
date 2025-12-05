@@ -33,7 +33,7 @@ def set_seed(seed: int = 42):
 def main():
     """Main execution function"""
     print("="*70)
-    print("EF Regression Model with Pruning Experiments")
+    print("Structured / Unstructured Pruning Comparison Experiment")
     print("="*70)
     
     # Set random seed for reproducibility

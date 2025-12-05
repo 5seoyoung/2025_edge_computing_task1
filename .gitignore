@@ -57,3 +57,7 @@ sample_echonet_dynamic/
 *.avi
 *.mp4
 
+# Markdown files (except README.md which is already tracked)
+*.md
+!README.md
+

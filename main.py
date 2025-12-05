@@ -7,6 +7,8 @@ import pandas as pd
 from pathlib import Path
 import json
 from datetime import datetime
+import random
+import numpy as np
 
 from config import Config
 from dataset import create_data_loaders
@@ -16,18 +18,54 @@ from prune_utils import apply_pruning_experiment
 from metrics import count_params, calculate_sparsity, evaluate_model, measure_latency
 
 
+def set_seed(seed: int = 42):
+    """Set random seed for reproducibility"""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    # For reproducibility (may slow down training)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
 def main():
     """Main execution function"""
     print("="*70)
     print("EF Regression Model with Pruning Experiments")
     print("="*70)
     
+    # Set random seed for reproducibility
+    set_seed(42)
+    print("Random seed set to 42 for reproducibility")
+    
     # Setup directories
     Config.setup_directories()
     
-    # Check device
-    device = torch.device(Config.DEVICE if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
+    # Check device and GPU info
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        print(f"✅ GPU Available!")
+        print(f"   Device: {device}")
+        print(f"   GPU Name: {torch.cuda.get_device_name(0)}")
+        print(f"   GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
+        print(f"   CUDA Version: {torch.version.cuda}")
+        print(f"   Batch Size: {Config.BATCH_SIZE}")
+    else:
+        device = torch.device("cpu")
+        print(f"⚠️  GPU not available, using CPU")
+        print(f"   Device: {device}")
+        print(f"   Batch Size: {Config.BATCH_SIZE}")
+    
+    # Auto-adjust NUM_WORKERS based on system recommendation
+    import os
+    import multiprocessing
+    max_workers = min(Config.NUM_WORKERS, multiprocessing.cpu_count(), 4)  # PyTorch recommends max 4
+    if max_workers < Config.NUM_WORKERS:
+        print(f"   ⚠️  Adjusted NUM_WORKERS: {Config.NUM_WORKERS} -> {max_workers} (system recommendation)")
+    else:
+        print(f"   Num Workers: {max_workers}")
     
     # Load data
     print("\n" + "="*70)
@@ -45,7 +83,7 @@ def main():
         num_frames=Config.NUM_FRAMES,
         image_size=Config.IMAGE_SIZE,
         batch_size=Config.BATCH_SIZE,
-        num_workers=Config.NUM_WORKERS
+        num_workers=max_workers
     )
     
     print(f"Train samples: {len(train_loader.dataset)}")

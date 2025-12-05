@@ -16,8 +16,9 @@ class Config:
     # Model parameters
     NUM_FRAMES = 32  # Number of frames to sample from video
     IMAGE_SIZE = 112  # Resize to 112x112
-    BATCH_SIZE = 8
-    NUM_WORKERS = 4
+    # GPU 서버 최적화 설정 (자동으로 GPU 감지 시 적용)
+    BATCH_SIZE = 16  # GPU: 16 (8GB GPU), 32 (16GB+ GPU)로 조정 가능
+    NUM_WORKERS = 4  # 자동 조정됨 (시스템 권장값 사용, main.py에서 조정)
     
     # Training parameters
     NUM_EPOCHS = 50
